@@ -1,0 +1,13 @@
+#!/bin/bash
+
+SAVEIFS=$IFS    # save old IFS value
+IFS=$'\n'       # make newlines the only separator
+
+echo "Powering off all running VMs"
+for vm in $(VBoxManage list runningvms | awk '{print substr($2, 2, length($2) - 2)}') # you might want to limit your search by `| grep 'some vm name here' ` *before* the pipe to awk 
+do
+	vmname=`VBoxManage showvminfo ${vm} | grep Name: | awk '{print $2}'`
+echo "Powering off VM ${vmname}"
+#VBoxManage controlvm ${vm} poweroff
+echo "VM ${vm} powered off"
+done

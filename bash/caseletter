@@ -1,0 +1,11 @@
+#!/bin/sh
+if [[ $# -eq 0 ]] ; then
+    echo "Usage: ${0##*/} word U"
+    exit 0
+fi
+
+case "$2" in
+    U) echo "$1" | tr '[:lower:]' '[:upper:]';;
+    *) echo "$1" | tr '[:upper:]' '[:lower:]';;
+esac
+

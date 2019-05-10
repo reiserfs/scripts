@@ -1,0 +1,22 @@
+#!/bin/bash
+
+read -p "Mail Server: " server
+
+from="root@localhost.com"
+port="25"
+to="kmreiserfs@gmail.com"
+# create message
+function mail_input {
+echo "ehlo $(hostname -f)"
+echo "MAIL FROM: <$from>"
+echo "RCPT TO: <$to>"
+echo "DATA"
+echo "From: <$from>"
+echo "To: <$to>"
+echo "Subject: Testando"
+echo "This is only a test. Please do not panic. If this works, then all is well, else all is not well."
+echo "."
+echo "quit"
+}
+
+mail_input | ncat $server $port || err_exit 
