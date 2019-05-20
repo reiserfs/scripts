@@ -1,0 +1,14 @@
+#!/bin/bash
+tmpfile=$(mktemp /tmp/spamdsn.XXXXXX)
+cat /var/log/maillog |egrep -w 'postfix/lmtp|postfix/smtp|postfix/qmgr'| egrep -w 'dsn=2.5.0|from' > $tmpfile
+
+for xid in $(cat $tmpfile | grep dsn=2.5.0 | awk '{print $6}')
+        do
+           xcode=`cat $tmpfile | grep $xid `
+           xfrom=`echo $xcode | grep $xid | grep from | awk '{print $7}'`;
+           xto=`echo $xcode | grep $xid | grep to | awk '{print $18}'`;
+           echo -e "\e[31mSPAM: $xid - \e[36m$xfrom - \e[33m$xto\e[0m";
+done
+echo $tmpfile
+rm $tmpfile
+

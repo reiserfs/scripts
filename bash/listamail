@@ -1,0 +1,10 @@
+#!/bin/bash
+while [ 0 ]; do 
+	x_mail=`mailq | grep : | wc -l` 
+	echo -e "\e[33m#############################################	"
+	echo -e "##		E-mails na fila:\e[31m ${x_mail} \e[33m	  ## "
+	echo -e "#############################################	"
+	echo -e "\e[0m"
+	sleep 2 
+	clear 
+	done

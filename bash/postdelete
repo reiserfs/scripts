@@ -1,0 +1,21 @@
+#!/bin/bash
+EMAILADDY=$1
+
+if [ -z "$EMAILADDY" ]
+then
+  echo "Usage: $0 <email adres>"
+  exit
+fi
+
+echo "Delete all emails addressed to $EMAILADDY, and sent by MAILER-DAEMON, from our Postfix queue."
+
+mailq | tail -n +2 | grep -v '^ *(' | awk -v "address=$EMAILADDY" 'BEGIN { RS = "" }
+  { 
+    # example conditions:
+    #   if ( $7 == "MAILER-DAEMON && $8 == address && $9 == "" )
+    #   if ( $7 == "MAILER-DAEMON && $8 == "" && $9 == address )
+    #   if ( $7 == "MAILER-DAEMON && $8 == address || $9 == address )
+    if ( $7 == "MAILER-DAEMON && $8 == address )
+      print $1 
+  }
+' | tr -d '*!' | postsuper -d -
