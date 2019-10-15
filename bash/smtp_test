@@ -1,10 +1,11 @@
 #!/bin/bash
 
-read -p "Mail Server: " server
+#read -p "Mail Server: " server
 
-from="root@localhost.com"
+server="$3"
+from="$1"
 port="25"
-to="user@gmail.com"
+to="$2"
 # create message
 function mail_input {
 echo "ehlo $(hostname -f)"
@@ -18,5 +19,4 @@ echo "This is only a test. Please do not panic. If this works, then all is well,
 echo "."
 echo "quit"
 }
-
-mail_input | ncat $server $port || err_exit 
+mail_input | ncat $server $port || err_exit
