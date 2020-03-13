@@ -1,0 +1,9 @@
+#!/bin/bash
+echo "Digite a senha do certificado $1: "
+read SENHA
+
+openssl pkcs12 -in $1 -nocerts -out $1.key -nodes -password pass:$SENHA
+
+openssl pkcs12 -in $1 -nokeys -out $1.cert -password pass:$SENHA
+
+#openssl rsa -in key.pem -out server.key 
