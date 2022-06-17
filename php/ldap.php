@@ -2,17 +2,17 @@
 
 // Exemplo ldapsearch
 //
-// LDAPTLS_REQCERT=never ldapsearch -v -H ldaps://195.22.21.180 -x -W -b "ou=colaborador,ou=funcionarios,DC=frassinetti,DC=local" -D "CN=moodleuser,CN=Users,DC=frassinetti,DC=local" "(sAMAccountName=*)"
+// LDAPTLS_REQCERT=never ldapsearch -v -H ldaps://195.22.21.180 -x -W -b "ou=colaborador,ou=funcionarios,DC=ti,DC=local" -D "CN=moodleuser,CN=Users,DC=ti,DC=local" "(sAMAccountName=*)"
 //
 //
 $settings = array(
   'NAME' => array(
-    'host' => 'ldaps://10.0.0.42:636/',
+    'host' => 'ldaps://10.0.0.1:636/',
     'port' => '636',
-    'bind_rdn' => 'CN=moodleuser,CN=Users,DC=frassinetti,DC=local', //rnd completa do usuario
+    'bind_rdn' => 'CN=moodleuser,CN=Users,DC=ti,DC=local', //rnd completa do usuario
     'bind_password' => '', // password
     'display_password' => 'XxXxXxX',  //senha mostrada na interface
-    'base_dn' => 'ou=colaborador,ou=funcionarios,DC=frassinetti,DC=local', //base_dn (-b)
+    'base_dn' => 'ou=colaborador,ou=funcionarios,DC=ti,DC=local', //base_dn (-b)
     'filter' => '(sAMAccountName=*)', //filtro
     'attributes' => array('cn'),
   ),
