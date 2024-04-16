@@ -1,9 +1,0 @@
-#!/bin/bash
-#
-# tnm@eurotux.com <Thiago Melo>
-#
-
-if [ $# -eq 0 ] ; then
-        echo "Usage: named" 
-        exit 0
-fi
