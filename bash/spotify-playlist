@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+
+set -e
+set -o errexit
+
+CID=${2}
+CS=${3}
+
+auth=$(echo -n "$CID:$CS" | base64 -w 0)
+t=$(curl -X "POST" -H "Authorization: Basic $auth" -d grant_type=client_credentials https://accounts.spotify.com/api/token)
+token=$(echo "$t" | jq -r '.access_token')
+
+playlisturl="${1}"
+user=$(echo $playlisturl | cut -d "/" -f5)
+uri=$(echo $playlisturl  | cut -d "/" -f7 | cut -d "?" -f1)
+
+t=$(curl "https://api.spotify.com/v1/users/$user/playlists/$uri?fields=name" -H "Authorization: Bearer $token")
+playlist=$(echo "$t" | jq -r '.name')
+
+offset=0
+while (( $offset < 42000 )); do
+  t=$(curl "https://api.spotify.com/v1/users/$user/playlists/$uri/tracks?fields=items(track(uri))&offset=$offset" -H "Authorization: Bearer $token" )
+  tracks=$(echo "$t" | jq -r '.items[] | .track | .uri' )
+  #echo "$tracks"
+  spotify-ripper $tracks 
+  if [ -z "$tracks" ]; then
+    break
+  fi
+  offset=$[$offset + 100]
+done

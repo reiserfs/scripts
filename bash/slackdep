@@ -1,0 +1,15 @@
+#!/bin/bash
+
+prog="$1"
+loca=$(whereis $prog | awk '{print $2}')
+
+while read line 
+	do read -r arquivo fullpath <<<$(echo $line | awk '{print $1,$3;}') 
+#	   echo $arquivo $fullpath
+	  #procura=$(grep $arquivo /var/log/packages/* | wc -l)
+	  #[[ $procura -eq 0 ]] && echo false || echo true
+	  while read line
+	  	do pacotes="${pacotes}\n$(echo $line | awk -F"[:/]" '{print $5}')"
+	  done < <(grep $arquivo /var/log/packages/*)
+   done < <(ldd $loca)
+echo -e $pacotes | sort -u

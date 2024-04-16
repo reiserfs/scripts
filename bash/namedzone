@@ -1,0 +1,75 @@
+#!/bin/bash
+#
+# tnm@eurotux.com <Thiago Melo>
+#
+
+# Regular Colors
+Black='\033[0;30m'        # Black
+Red='\033[0;31m'          # Red
+Green='\033[0;32m'        # Green
+Yellow='\033[0;33m'       # Yellow
+Blue='\033[0;34m'         # Blue
+Purple='\033[0;35m'       # Purple
+Cyan='\033[0;36m'         # Cyan
+White='\033[0;37m'        # White
+RESET='\033[0m'       # Text Reset
+
+function ProgressBar {
+    let _progress=(${1}*100/${2}*100)/100
+    let _done=(${_progress}*4)/10
+    let _left=40-$_done
+    _fill=$(printf "%${_done}s")
+    _empty=$(printf "%${_left}s")
+
+    printf "\rAnalisando dominios: [${_fill// /=}${_empty// /-}] ${_progress}%% (${1} ${2})"
+}
+
+if [ $# -eq 0 ] ; then
+        echo "Usage: namedzone domain zonefile certificate" 
+        exit 0
+fi
+
+zonefile=$2
+domainsufix=$1
+certificate=$3
+certdate=`openssl x509 -in $certificate -enddate -noout | sed "s/.*=\(.*\)/\1/"` 
+newdate=$(date -d "$certdate" +"%b %d %Y")
+certsubject=`openssl x509 -in $certificate -subject -noout | sed "s/.*=\(.*\)/\1/"` 
+certtimedate=`date -d "$certdate" +"%s"`
+countfile=`cat $zonefile | grep " A "| wc -l`
+alert=""
+count=1
+output="\n ${Yellow}Dominio %% Servidor %% subj: $certsubject %% exp: $newdate:  %% Expired ${RESET}"
+
+echo "$certsubject >> $newdate"
+
+while read zone
+   do   prefix=`echo $zone | awk '{print $1}'`
+   	flag=`echo $zone | awk '{print $3}'`
+	ip=`echo $zone | awk '{print $4}'`
+	subject=false
+	if [[ $flag == "A" ]]
+         then
+	      { read subject; read expired; } < <(timeout 2 openssl s_client -showcerts -servername $prefix.$domainsufix -connect $prefix.$domainsufix:443 2> /dev/null </dev/null | openssl x509 -noout -subject -enddate 2>/dev/null)
+	        if [ -n "$subject" ]
+	         then 
+			expired=`echo $expired | sed "s/.*=\(.*\)/\1/"`
+			if [ $(date -d "+ 30 days" +"%s") -ge $(date -d "$expired" +"%s") ];
+			  then
+			    expired=${Red}$(date -d "$expired" +"%b %d %Y")${RESET}
+			    alert=${Cyan}YES${RESET}
+			  else
+			    expired=${Green}$(date -d "$expired" +"%b %d %Y")${RESET}
+			    alert=" "
+			fi
+			subject=`echo $subject | sed "s/.*=\(.*\)/\1/"`
+			servidor=`host -4 $prefix.$domainsufix |grep "has address"| awk {'print $4'}`
+			output="\n $output \n $prefix.$domainsufix %% $servidor %% $subject %% $expired %% $alert"
+		fi
+		ProgressBar ${count} ${countfile} $prefix.$domainsufix 
+		((count++))
+	fi
+done < $zonefile
+
+echo ""
+echo -e "$output" | column -t -s'%%' 

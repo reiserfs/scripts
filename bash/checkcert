@@ -1,6 +1,11 @@
 #!/bin/bash
+# tnm@eurotux.com
+
+if [ $# -ne 2 ] ; then
+    echo "Uso: checkcert certificado chave"
+else
 echo "Certificado: "
 openssl x509 -in $1 -noout -modulus | openssl md5
 echo "Chave: "
 openssl rsa -modulus -noout -in $2 | openssl md5 
-
+fi

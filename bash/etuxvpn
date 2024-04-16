@@ -1,0 +1,5 @@
+#!/bin/bash
+senha=`ksshaskpass "Senha da VPN" 2> /dev/null`
+otp=`ksshaskpass "Código de autenticação 2FA" 2> /dev/null`
+echo "senha $senha"
+echo "OTP $otp"

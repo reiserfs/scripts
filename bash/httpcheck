@@ -1,0 +1,1 @@
+for z in `httpd -S | grep "port 80" | gawk -F " " '{print $4}'`; do curl -L -I $z; done
